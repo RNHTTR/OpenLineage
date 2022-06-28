@@ -10,6 +10,7 @@ import io.openlineage.client.OpenLineage.RunEvent;
 import io.openlineage.client.Utils;
 import io.openlineage.spark.agent.EventEmitter;
 import io.openlineage.spark.agent.Versions;
+import io.openlineage.spark.agent.filters.EventFilterUtils;
 import io.openlineage.spark.agent.util.PlanUtils;
 import io.openlineage.spark.api.OpenLineageContext;
 import java.time.Instant;
@@ -60,6 +61,9 @@ class SparkSQLExecutionContext implements ExecutionContext {
     if (!olContext.getQueryExecution().isPresent()) {
       log.info(NO_EXECUTION_INFO, olContext);
       return;
+    } else if (EventFilterUtils.isDisabled(olContext, startEvent)) {
+      log.info("filtering OL event");
+      return;
     }
     RunEvent event =
         runEventBuilder.buildRun(
@@ -81,6 +85,9 @@ class SparkSQLExecutionContext implements ExecutionContext {
     if (!olContext.getQueryExecution().isPresent()) {
       log.info(NO_EXECUTION_INFO, olContext);
       return;
+    } else if (EventFilterUtils.isDisabled(olContext, endEvent)) {
+      log.info("filtering OL event");
+      return;
     }
     RunEvent event =
         runEventBuilder.buildRun(
@@ -99,6 +106,9 @@ class SparkSQLExecutionContext implements ExecutionContext {
     if (!olContext.getQueryExecution().isPresent()) {
       log.info(NO_EXECUTION_INFO, olContext);
       return;
+    } else if (EventFilterUtils.isDisabled(olContext, stageSubmitted)) {
+      log.info("filtering OL event");
+      return;
     }
     RunEvent event =
         runEventBuilder.buildRun(
@@ -116,6 +126,9 @@ class SparkSQLExecutionContext implements ExecutionContext {
   public void end(SparkListenerStageCompleted stageCompleted) {
     if (!olContext.getQueryExecution().isPresent()) {
       log.info(NO_EXECUTION_INFO, olContext);
+      return;
+    } else if (EventFilterUtils.isDisabled(olContext, stageCompleted)) {
+      log.info("filtering OL event");
       return;
     }
     RunEvent event =
@@ -141,6 +154,9 @@ class SparkSQLExecutionContext implements ExecutionContext {
     if (!olContext.getQueryExecution().isPresent()) {
       log.info(NO_EXECUTION_INFO, olContext);
       return;
+    } else if (EventFilterUtils.isDisabled(olContext, jobStart)) {
+      log.info("filtering OL event");
+      return;
     }
     RunEvent event =
         runEventBuilder.buildRun(
@@ -163,6 +179,9 @@ class SparkSQLExecutionContext implements ExecutionContext {
 
     if (!olContext.getQueryExecution().isPresent()) {
       log.info(NO_EXECUTION_INFO, olContext);
+      return;
+    } else if (EventFilterUtils.isDisabled(olContext, jobEnd)) {
+      log.info("filtering OL event");
       return;
     }
     RunEvent event =
